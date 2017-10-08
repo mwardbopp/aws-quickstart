@@ -669,8 +669,8 @@ Resources:
         licenseKey1: !Ref licenseKey1
         sshKey: !Ref KeyName
         restrictedSrcAddress: !Ref F5SrcAddress
-        subnet2Az1: !Ref PublicSubnet
-        subnet1Az1: !Ref PrivateSubnet
+        subnet2Az1: !Ref PrivateSubnet
+        subnet1Az1: !Ref PublicSubnet
 
 
 Outputs:
