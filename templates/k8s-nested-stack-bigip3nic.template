@@ -32,26 +32,26 @@ Metadata:
   AWS::CloudFormation::Interface:
     ParameterGroups:
     - Label:
-        default: Required
+        default: Kubernetes Cluster
       Parameters:
       - AvailabilityZone
       - AdminIngressLocation
       - KeyName
-      - F5SrcAddressApp
-      - F5SrcAddress
-    - Label:
-        default: Advanced
-      Parameters:
+      - DiskSizeGb
       - NetworkingProvider
       - K8sNodeCapacity
       - InstanceType
-      - F5InstanceType
-      - DiskSizeGb
       - BastionInstanceType
       - QSS3BucketName
       - QSS3KeyPrefix
-      - licenseKey1
 
+    - Label:
+        default: F5 BIG-IP Stack
+      Parameters:
+      - F5InstanceType
+      - licenseKey1
+      - F5SrcAddressApp
+      - F5SrcAddress
 
     ParameterLabels:
       KeyName:
@@ -68,7 +68,7 @@ Metadata:
         default: F5 License Key
       F5SrcAddressApp:
         default: F5 Source Address(es) for Web Application Access 80/443
-      F5SrcAddressApp:
+      F5SrcAddress:
         default: F5 Source Address(es) for Management Access
       DiskSizeGb:
         default: Disk Size (GiB)
