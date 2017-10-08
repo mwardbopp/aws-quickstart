@@ -83,6 +83,66 @@ Metadata:
       NetworkingProvider:
         default: Networking Provider
 
+Mappings:
+  BigipRegionMap:
+    ap-northeast-1:
+      Best: ami-eb1d2c8c
+      Better: ami-54192833
+      Good: ami-c31a2ba4
+    ap-northeast-2:
+      Best: ami-dcdf02b2
+      Better: ami-23a27f4d
+      Good: ami-14de037a
+    ap-south-1:
+      Best: ami-0ed4a661
+      Better: ami-fed9ab91
+      Good: ami-7bd8aa14
+    ap-southeast-1:
+      Best: ami-9b08b2f8
+      Better: ami-f209b391
+      Good: ami-5b09b338
+    ap-southeast-2:
+      Best: ami-67d8d304
+      Better: ami-1fdfd47c
+      Good: ami-10dfd473
+    ca-central-1:
+      Best: ami-42922e26
+      Better: ami-b2962ad6
+      Good: ami-f98d319d
+    eu-central-1:
+      Best: ami-c74e91a8
+      Better: ami-524d923d
+      Good: ami-ed518e82
+    eu-west-1:
+      Best: ami-e8a2af8e
+      Better: ami-62a1ac04
+      Good: ami-1bbfb27d
+    eu-west-2:
+      Best: ami-dba7b3bf
+      Better: ami-faa0b49e
+      Good: ami-4da5b129
+    sa-east-1:
+      Best: ami-7d8ee211
+      Better: ami-248de148
+      Good: ami-2e8de142
+    us-east-1:
+      Best: ami-4c76185a
+      Better: ami-46781650
+      Good: ami-44751b52
+    us-east-2:
+      Best: ami-2be6c14e
+      Better: ami-d31a3db6
+      Good: ami-2ae6c14f
+    us-west-1:
+      Best: ami-e56d4b85
+      Better: ami-766c4a16
+      Good: ami-7d6a4c1d
+    us-west-2:
+      Best: ami-a4bc27c4
+      Better: ami-e3be2583
+      Good: ami-fdb3289d
+
+
 # The Parameters allow the user to pass custom settings to the stack before creation
 Parameters:
   KeyName:
@@ -136,51 +196,39 @@ Parameters:
     - d2.8xlarge
     ConstraintDescription: must be a valid EC2 instance type.
 
-  F5InstanceType:
-    Description: EC2 instance type for the F5.
-    Type: String
-    Default: t2.medium
+
+  imageName:
     AllowedValues:
-    - t2.nano
-    - t2.micro
-    - t2.small
-    - t2.medium
-    - t2.large
-    - m3.medium
-    - m3.large
-    - m3.xlarge
-    - m3.2xlarge
-    - m4.large
-    - m4.xlarge
-    - m4.2xlarge
-    - m4.4xlarge
-    - m4.10xlarge
-    - c3.large
-    - c3.xlarge
-    - c3.2xlarge
-    - c3.4xlarge
-    - c3.8xlarge
-    - c4.large
-    - c4.xlarge
-    - c4.2xlarge
-    - c4.4xlarge
-    - c4.8xlarge
-    - g2.2xlarge
-    - g2.8xlarge
-    - r3.large
-    - r3.xlarge
-    - r3.2xlarge
-    - r3.4xlarge
-    - r3.8xlarge
-    - i2.xlarge
-    - i2.2xlarge
-    - i2.4xlarge
-    - i2.8xlarge
-    - d2.xlarge
-    - d2.2xlarge
-    - d2.4xlarge
-    - d2.8xlarge
-    ConstraintDescription: must be a valid EC2 instance type.
+      - Good
+      - Better
+      - Best
+    ConstraintDescription: Must be a valid F5 BIG-IP VE image type
+    Default: Best
+    Description: F5 BIG-IP Performance Type
+    Type: String
+  F5InstanceType:
+    AllowedValues:
+      - t2.medium
+      - t2.large
+      - c3.2xlarge
+      - c3.4xlarge
+      - c3.8xlarge
+      - c4.xlarge
+      - c4.2xlarge
+      - c4.4xlarge
+      - c4.8xlarge
+      - m3.xlarge
+      - m3.2xlarge
+      - m4.large
+      - m4.xlarge
+      - m4.2xlarge
+      - m4.4xlarge
+      - m4.10xlarge
+      - m4.16xlarge
+    ConstraintDescription: Must be a valid EC2 instance type for BIG-IP
+    Default: m3.2xlarge
+    Description: Size of the F5 BIG-IP Virtual Instance
+    Type: String
 
   # Specifies the size of the root disk for all EC2 instances, including master
   # and nodes.
@@ -614,7 +662,7 @@ Resources:
       Parameters:
         Vpc: !Ref VPC
  #       AvailabilityZone: !Ref AvailabilityZone
- #       InstanceType: !Ref F5InstanceType
+        instanceType: !Ref F5InstanceType
  #       DiskSizeGb: !Ref DiskSizeGb
         managementSubnetAz1: !Ref ManagementSubnet
         restrictedSrcAddressApp: !Ref F5SrcAddressApp
