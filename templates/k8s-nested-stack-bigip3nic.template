@@ -14,18 +14,7 @@
 
 ---
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'QS(5042) Kubernetes AWS CloudFormation Template: Create a Kubernetes
-  cluster in a new VPC. The master node is an auto-recovering Amazon EC2
-  instance. 1-20 additional EC2 instances in an AutoScalingGroup join the
-  Kubernetes cluster as nodes. An ELB provides configurable external access
-  to the Kubernetes API. The new VPC includes a bastion host to grant
-  SSH access to the private subnet for the cluster. This template creates
-  two stacks: one for the new VPC and one for the cluster. The stack is
-  suitable for development and small single-team clusters. **WARNING** This
-  template creates four Amazon EC2 instances with default settings. You will
-  be billed for the AWS resources used if you create a stack from this template.
-  **SUPPORT** Please visit http://jump.heptio.com/aws-qs-help for support.
-  **NEXT STEPS** Please visit http://jump.heptio.com/aws-qs-next.'
+Description: rs. **WARNING** This template is based on the Heptio AWS Quickstart and modified to ask for and then pass through parameters to the F5 BIGIP 3NIC standalone CFT. https://github.com/heptio/aws-quickstart/blob/master/templates/kubernetes-cluster-with-new-vpc.template 
 
 # The Metadata tells AWS how to display the parameters during stack creation
 Metadata:
@@ -546,7 +535,7 @@ Resources:
     Properties:
       RouteTableId: !Ref ManagementSubnetRouteTable
       DestinationCidrBlock: 0.0.0.0/0
-      NatGatewayId: !Ref NATGateway
+      GatewayId: !Ref InternetGateway
 
   ManagementSubnetRouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -615,6 +604,50 @@ Resources:
             chmod +x $BASTION_BOOTSTRAP_FILE
 
             ./$BASTION_BOOTSTRAP_FILE --banner https://${QSS3BucketName}/${QSS3KeyPrefix}/scripts/banner_message.txt --enable true
+
+  # Create internal Security Group
+  InternalTargetSG:
+    Type: AWS::EC2:SecurityGroup
+    Properties:
+      GroupDescription: Allow communication between F5 Internal and k8s cluster
+      VpcId: !Ref VPC
+
+  # Create internal Security Group
+  InternalSourceSG:
+    Type: AWS::EC2:SecurityGroup
+    Properties:
+      GroupDescription: Allow communication between F5 Internal and k8s cluster
+      VpcId: !Ref VPC
+
+  InternalOutboundRule:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      IpProtocol: tcp
+      FromPort: '0'
+      ToPort: '65535'
+      DestinationSecurityGroupId:
+        Fn::GetAtt:
+        - InternalTargetSG
+        - GroupId
+      GroupId:
+        Fn::GetAtt:
+        - InternalSourceSG
+        - GroupId
+
+  InternalInboundRule:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      IpProtocol: tcp
+      FromPort: '0'
+      ToPort: '65535'
+      SourceSecurityGroupId:
+        Fn::GetAtt:
+        - InternalSourceSG
+        - GroupId
+      GroupId:
+        Fn::GetAtt:
+        - InternalTargetSG
+        - GroupId
 
   # Open up port 22 for SSH for the bastion host
   BastionSecurityGroup:
