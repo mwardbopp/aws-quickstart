@@ -606,14 +606,7 @@ Resources:
             ./$BASTION_BOOTSTRAP_FILE --banner https://${QSS3BucketName}/${QSS3KeyPrefix}/scripts/banner_message.txt --enable true
 
   # Create internal Security Group
-  InternalTargetSG:
-    Type: AWS::EC2:SecurityGroup
-    Properties:
-      GroupDescription: Allow communication between F5 Internal and k8s cluster
-      VpcId: !Ref VPC
-
-  # Create internal Security Group
-  InternalSourceSG:
+  InternalSG:
     Type: AWS::EC2:SecurityGroup
     Properties:
       GroupDescription: Allow communication between F5 Internal and k8s cluster
@@ -627,11 +620,11 @@ Resources:
       ToPort: '65535'
       DestinationSecurityGroupId:
         Fn::GetAtt:
-        - InternalTargetSG
+        - InternalSG
         - GroupId
       GroupId:
         Fn::GetAtt:
-        - InternalSourceSG
+        - InternalSG
         - GroupId
 
   InternalInboundRule:
@@ -642,11 +635,11 @@ Resources:
       ToPort: '65535'
       SourceSecurityGroupId:
         Fn::GetAtt:
-        - InternalSourceSG
+        - InternalSG
         - GroupId
       GroupId:
         Fn::GetAtt:
-        - InternalTargetSG
+        - InternalSG
         - GroupId
 
   # Open up port 22 for SSH for the bastion host
@@ -704,6 +697,7 @@ Resources:
         restrictedSrcAddress: !Ref F5SrcAddress
         subnet2Az1: !Ref PrivateSubnet
         subnet1Az1: !Ref PublicSubnet
+        bigipInternalSecurityGroup: !Ref InternalSG
 
 
 Outputs:
