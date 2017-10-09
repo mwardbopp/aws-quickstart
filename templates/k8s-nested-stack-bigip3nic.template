@@ -607,7 +607,7 @@ Resources:
 
   # Create internal Security Group
   InternalSG:
-    Type: AWS::EC2:SecurityGroup
+    Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Allow communication between F5 Internal and k8s cluster
       VpcId: !Ref VPC
